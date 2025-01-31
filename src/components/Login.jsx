@@ -25,8 +25,8 @@ const Login = () => {
         },
         { withCredentials: true }
       );
-      dispatch(addUser(res.data));
-      return navigate("/");
+      res?.data?._id && dispatch(addUser(res?.data));
+      res?.data?._id ? navigate("/") : "";
     } catch (err) {
       setError(err?.response?.data || "Something went wrong");
     }
@@ -39,7 +39,8 @@ const Login = () => {
         { firstName, lastName, emailId, password },
         { withCredentials: true }
       );
-      dispatch(addUser(res.data.data));
+      // dispatch(addUser(res.data.data));
+      setIsLoginForm(true);
       return navigate("/login");
     } catch (err) {
       setError(err?.response?.data || "Something went wrong");

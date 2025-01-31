@@ -2,11 +2,12 @@ import { useState } from "react";
 import UserCard from "./UserCard";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 
 const EditProfile = ({ user1 }) => {
-  let { user } = user1;
+  let user = user1;
+  const loginuser = useSelector((store) => store.user);
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
   const [photoUrl, setPhotoUrl] = useState(user.photo);
@@ -21,19 +22,21 @@ const EditProfile = ({ user1 }) => {
     //Clear Errors
     setError("");
     try {
-      const res = await axios.patch(
-        BASE_URL + "/profile/edit",
+      const res = await axios.put(
+        BASE_URL + `/updateUser/${loginuser?._id}`,
         {
           firstName,
           lastName,
-          photoUrl,
+          photo: photoUrl,
           age,
           gender,
           about,
         },
-        { withCredentials: true }
+        {
+          withCredentials: true,
+        }
       );
-      dispatch(addUser(res?.data?.data));
+      dispatch(addUser(res?.data));
       setShowToast(true);
       setTimeout(() => {
         setShowToast(false);
@@ -118,7 +121,7 @@ const EditProfile = ({ user1 }) => {
                   />
                 </label>
               </div>
-              <p className="text-red-500">{error}</p>
+              <p className="text-red-500">{error?.response?.data?.message}</p>
               <div className="card-actions justify-center m-2">
                 <button className="btn btn-primary" onClick={saveProfile}>
                   Save Profile
